@@ -1,0 +1,398 @@
+{
+  "malaria": {
+    "cause": "Plasmodium parasites transmitted through female Anopheles mosquito bites.",
+    "signs_and_symptoms": [
+      "High fever",
+      "Chills",
+      "Headache",
+      "Muscle pain",
+      "Nausea"
+    ],
+    "drugs": [
+      "Artemether/Lumefantrine",
+      "Artesunate",
+      "Chloroquine"
+    ],
+    "prevention": "Use insecticide-treated nets, eliminate stagnant water, and take antimalarial prophylaxis if recommended.",
+    "advice": "Complete the full course of medication. If symptoms persist, consult a doctor."
+  },
+  "cholera": {
+    "cause": "Infection by Vibrio cholerae bacteria through contaminated food or water.",
+    "signs_and_symptoms": [
+      "Watery diarrhea",
+      "Vomiting",
+      "Dehydration",
+      "Leg cramps"
+    ],
+    "drugs": [
+      "Oral Rehydration Salts (ORS)",
+      "Azithromycin",
+      "Doxycycline"
+    ],
+    "prevention": "Drink safe water, practice good sanitation, and wash hands frequently.",
+    "advice": "Rehydrate immediately and seek medical help if symptoms are severe."
+  },
+  "headache": {
+    "cause": "Tension, stress, dehydration, or underlying illness.",
+    "signs_and_symptoms": [
+      "Pain in head or neck",
+      "Sensitivity to light",
+      "Fatigue"
+    ],
+    "drugs": [
+      "Paracetamol",
+      "Ibuprofen",
+      "Aspirin"
+    ],
+    "prevention": "Stay hydrated, manage stress, and get regular sleep.",
+    "advice": "Avoid overuse of painkillers. If headaches persist or worsen, see a doctor."
+  },
+  "cough": {
+    "cause": "Respiratory infections, allergies, asthma, or smoking.",
+    "signs_and_symptoms": [
+      "Dry or productive cough",
+      "Chest discomfort",
+      "Shortness of breath"
+    ],
+    "drugs": [
+      "Loratadine",
+      "Salbutamol",
+      "Aminophylline"
+    ],
+    "prevention": "Avoid allergens and pollutants. Treat infections promptly.",
+    "advice": "If cough persists more than a week or worsens, seek medical attention."
+  },
+  "stomach pain": {
+    "cause": "Indigestion, infection, ulcers, or food poisoning.",
+    "signs_and_symptoms": [
+      "Abdominal discomfort",
+      "Nausea",
+      "Bloating",
+      "Cramps"
+    ],
+    "drugs": [
+      "Hyoscine",
+      "Metronidazole",
+      "Omeprazole"
+    ],
+    "prevention": "Eat hygienic food and avoid known triggers.",
+    "advice": "Persistent or severe pain should be evaluated by a healthcare provider."
+  },
+  "fever": {
+    "cause": "Viral or bacterial infections, inflammatory conditions.",
+    "signs_and_symptoms": [
+      "High body temperature",
+      "Chills",
+      "Sweating",
+      "Weakness"
+    ],
+    "drugs": [
+      "Paracetamol",
+      "Ibuprofen",
+      "Acetaminophen"
+    ],
+    "prevention": "Prevent infections with hygiene and vaccination.",
+    "advice": "Manage with antipyretics. See a doctor if fever is high or persistent."
+  },
+  "stomach ulcer": {
+    "cause": "H. pylori infection or long-term NSAID use.",
+    "signs_and_symptoms": [
+      "Burning stomach pain",
+      "Bloating",
+      "Nausea",
+      "Weight loss"
+    ],
+    "drugs": [
+      "Omeprazole",
+      "Ranitidine",
+      "Antacids"
+    ],
+    "prevention": "Avoid NSAIDs and reduce stress. Eat regularly.",
+    "advice": "Complete treatment and follow dietary recommendations."
+  },
+  "measles": {
+    "cause": "Measles virus spread through respiratory droplets.",
+    "signs_and_symptoms": [
+      "Fever",
+      "Cough",
+      "Runny nose",
+      "Skin rash",
+      "Red eyes"
+    ],
+    "drugs": [
+      "Vitamin A",
+      "Paracetamol",
+      "Diphenhydramine"
+    ],
+    "prevention": "Vaccination and avoiding contact with infected individuals.",
+    "advice": "Rest, hydrate, and monitor for complications like pneumonia."
+  },
+  "pneumonia": {
+    "cause": "Bacterial, viral, or fungal lung infection.",
+    "signs_and_symptoms": [
+      "Cough with phlegm",
+      "Fever",
+      "Chest pain",
+      "Shortness of breath"
+    ],
+    "drugs": [
+      "Amoxicillin-Clavulanic acid",
+      "Azithromycin",
+      "Ceftriaxone"
+    ],
+    "prevention": "Vaccination and avoiding smoking.",
+    "advice": "Seek medical help early and complete antibiotics."
+  },
+  "tuberculosis": {
+    "cause": "Infection by Mycobacterium tuberculosis.",
+    "signs_and_symptoms": [
+      "Persistent cough",
+      "Weight loss",
+      "Night sweats",
+      "Fatigue"
+    ],
+    "drugs": [
+      "Rifampicin",
+      "Isoniazid",
+      "Ethambutol"
+    ],
+    "prevention": "Vaccination (BCG), good ventilation, and early diagnosis.",
+    "advice": "Adhere strictly to treatment for at least 6 months."
+  },
+  "diarrhea": {
+    "cause": "Contaminated food or water, viral or bacterial infections.",
+    "signs_and_symptoms": [
+      "Loose stools",
+      "Dehydration",
+      "Stomach cramps"
+    ],
+    "drugs": [
+      "ORS",
+      "Zinc sulfate",
+      "Metronidazole"
+    ],
+    "prevention": "Drink clean water and observe food hygiene.",
+    "advice": "Rehydrate frequently. Severe cases require medical evaluation."
+  },
+  "hiv/aids": {
+    "cause": "Infection by the Human Immunodeficiency Virus (HIV).",
+    "signs_and_symptoms": [
+      "Weight loss",
+      "Frequent infections",
+      "Night sweats",
+      "Fatigue"
+    ],
+    "drugs": [
+      "Tenofovir",
+      "Lamivudine",
+      "Efavirenz"
+    ],
+    "prevention": "Safe sex, clean needles, and HIV testing.",
+    "advice": "Start and adhere to ART. Maintain regular medical checkups."
+  },
+  "diabetes": {
+    "cause": "Insufficient insulin production or resistance to insulin.",
+    "signs_and_symptoms": [
+      "Frequent urination",
+      "Excessive thirst",
+      "Weight loss",
+      "Fatigue"
+    ],
+    "drugs": [
+      "Metformin",
+      "Insulin",
+      "Glimepiride"
+    ],
+    "prevention": "Maintain healthy weight, eat balanced diet, exercise regularly.",
+    "advice": "Monitor blood sugar, adhere to medication, and avoid sugary foods."
+  },
+  "hypertension": {
+    "cause": "Unknown (essential) or secondary to other conditions like kidney disease.",
+    "signs_and_symptoms": [
+      "Headache",
+      "Blurred vision",
+      "Chest pain",
+      "Fatigue"
+    ],
+    "drugs": [
+      "Lisinopril",
+      "Amlodipine",
+      "Hydrochlorothiazide"
+    ],
+    "prevention": "Reduce salt intake, exercise, avoid alcohol and smoking.",
+    "advice": "Take medication consistently and monitor blood pressure regularly."
+  },
+  "influenza": {
+    "cause": "Infection by influenza virus types A, B, or C.",
+    "signs_and_symptoms": [
+      "Fever",
+      "Cough",
+      "Sore throat",
+      "Muscle aches"
+    ],
+    "drugs": [
+      "Oseltamivir",
+      "Paracetamol",
+      "Antihistamines"
+    ],
+    "prevention": "Get vaccinated annually and maintain hand hygiene.",
+    "advice": "Rest, stay hydrated, and avoid spreading the virus."
+  },
+  "arthritis": {
+    "cause": "Joint inflammation due to autoimmune conditions, aging, or injury.",
+    "signs_and_symptoms": [
+      "Joint pain",
+      "Stiffness",
+      "Swelling",
+      "Reduced mobility"
+    ],
+    "drugs": [
+      "Ibuprofen",
+      "Diclofenac",
+      "Prednisone"
+    ],
+    "prevention": "Stay active, maintain a healthy weight, and avoid joint injuries.",
+    "advice": "Use anti-inflammatory drugs and do regular low-impact exercise."
+  },
+  "asthma": {
+    "cause": "Inflammation and narrowing of airways triggered by allergens or exercise.",
+    "signs_and_symptoms": [
+      "Wheezing",
+      "Shortness of breath",
+      "Coughing",
+      "Chest tightness"
+    ],
+    "drugs": [
+      "Salbutamol",
+      "Beclomethasone",
+      "Montelukast"
+    ],
+    "prevention": "Avoid triggers such as smoke, dust, and cold air.",
+    "advice": "Use inhalers as prescribed and follow an asthma action plan."
+  },
+  "acne": {
+    "cause": "Blocked hair follicles due to oil and dead skin cells.",
+    "signs_and_symptoms": [
+      "Pimples",
+      "Whiteheads",
+      "Blackheads",
+      "Skin inflammation"
+    ],
+    "drugs": [
+      "Benzoyl Peroxide",
+      "Tretinoin",
+      "Clindamycin gel"
+    ],
+    "prevention": "Clean skin regularly and avoid greasy cosmetics.",
+    "advice": "Use treatments consistently and avoid squeezing pimples."
+  },
+  "heartburn": {
+    "cause": "Stomach acid backing up into the esophagus.",
+    "signs_and_symptoms": [
+      "Burning chest pain",
+      "Regurgitation",
+      "Bitter taste in mouth"
+    ],
+    "drugs": [
+      "Omeprazole",
+      "Ranitidine",
+      "Antacids"
+    ],
+    "prevention": "Avoid trigger foods and do not lie down after meals.",
+    "advice": "Take medications as needed and eat smaller, frequent meals."
+  },
+  "rheumatism": {
+    "cause": "Chronic inflammation affecting joints or connective tissue.",
+    "signs_and_symptoms": [
+      "Joint stiffness",
+      "Swelling",
+      "Pain",
+      "Limited movement"
+    ],
+    "drugs": [
+      "Ibuprofen",
+      "Methotrexate",
+      "Prednisone"
+    ],
+    "prevention": "Exercise regularly and maintain joint health.",
+    "advice": "Follow up with doctor and manage with medications and therapy."
+  },
+  "catarrh": {
+    "cause": "Irritation or infection of mucous membranes in the nose or throat.",
+    "signs_and_symptoms": [
+      "Nasal congestion",
+      "Runny nose",
+      "Sore throat"
+    ],
+    "drugs": [
+      "Antihistamines",
+      "Paracetamol",
+      "Steam inhalation"
+    ],
+    "prevention": "Avoid allergens and stay warm in cold weather.",
+    "advice": "Rest and stay hydrated; if symptoms persist, consult a doctor."
+  },
+  "typhoid": {
+    "cause": "Infection with Salmonella typhi from contaminated food or water.",
+    "signs_and_symptoms": [
+      "Prolonged fever",
+      "Abdominal pain",
+      "Constipation or diarrhea"
+    ],
+    "drugs": [
+      "Ciprofloxacin",
+      "Ceftriaxone",
+      "Azithromycin"
+    ],
+    "prevention": "Drink clean water, practice food safety, and get vaccinated.",
+    "advice": "Complete full antibiotic course and monitor for complications."
+  },
+  "hepatitis a": {
+    "cause": "Infection by hepatitis A virus via contaminated food or water.",
+    "signs_and_symptoms": [
+      "Fatigue",
+      "Jaundice",
+      "Nausea",
+      "Abdominal pain"
+    ],
+    "drugs": [
+      "Supportive care",
+      "ORS",
+      "Antiemetics"
+    ],
+    "prevention": "Vaccination, good hygiene, and safe food practices.",
+    "advice": "Avoid alcohol and rest adequately during recovery."
+  },
+  "meningitis": {
+    "cause": "Infection of the membranes covering the brain and spinal cord.",
+    "signs_and_symptoms": [
+      "Stiff neck",
+      "High fever",
+      "Headache",
+      "Sensitivity to light"
+    ],
+    "drugs": [
+      "Ceftriaxone",
+      "Vancomycin",
+      "Dexamethasone"
+    ],
+    "prevention": "Vaccination and avoiding close contact with infected individuals.",
+    "advice": "Seek urgent medical care. Early treatment is critical."
+  },
+  "yellow fever": {
+    "cause": "Infection with yellow fever virus transmitted by mosquitoes.",
+    "signs_and_symptoms": [
+      "Fever",
+      "Yellow skin/eyes",
+      "Muscle pain",
+      "Vomiting"
+    ],
+    "drugs": [
+      "Paracetamol",
+      "Fluids",
+      "Antiemetics"
+    ],
+    "prevention": "Vaccination and mosquito control.",
+    "advice": "Rest, stay hydrated, and seek hospital care for severe cases."
+  }
+}
