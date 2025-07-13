@@ -15,16 +15,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Replace with your actual Gemini API key
-GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"  # Add your API key here
+# Get API key from environment variable
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Initialize Gemini
-try:
-    genai.configure(api_key=AlzaSyBtx5RsZGgCScMyMEtGFb8gYABnT1xFgRc)
-    model = genai.GenerativeModel("gemini-2.0-flash-exp")  # Using latest model
-except Exception as e:
-    print(f"Error initializing Gemini: {e}")
-    model = None
+model = None
+if GEMINI_API_KEY:
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+        model = genai.GenerativeModel("gemini-2.0-flash-exp")
+        print("Gemini API configured successfully")
+    except Exception as e:
+        print(f"Error initializing Gemini: {e}")
+        model = None
+else:
+    print("Warning: GEMINI_API_KEY environment variable not set")
 
 class PromptRequest(BaseModel):
     prompt: str
@@ -32,7 +37,10 @@ class PromptRequest(BaseModel):
 @app.post("/api/ai")
 async def ai_endpoint(request: PromptRequest):
     if not model:
-        raise HTTPException(status_code=500, detail="Gemini API not configured")
+        raise HTTPException(
+            status_code=500, 
+            detail="Gemini API not configured. Please set GEMINI_API_KEY environment variable."
+        )
     
     prompt = request.prompt.strip()
     if not prompt:
@@ -72,4 +80,12 @@ async def root():
 # Health check endpoint
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "gemini_configured": model is not None}
+    return {
+        "status": "healthy", 
+        "gemini_configured": model is not None,
+        "api_key_set": GEMINI_API_KEY is not None
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

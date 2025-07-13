@@ -5,6 +5,13 @@ __pycache__/
 Lib/
 Scripts/
 pyvenv.cfg
+*.dist-info/
+*.egg-info/
+
+# Environment variables
+.env
+.env.local
+.env.production
 
 # VSCode
 .vscode/
@@ -15,13 +22,12 @@ mediaid_full_dataset.json
 New Text Document.txt
 
 # Build
-*.dist-info/
-*.egg-info/
 pip.pyz
 
 # System
 Thumbs.db
 ehthumbs.db
 Desktop.ini
-# Created by venv; see https://docs.python.org/3/library/venv.html
+
+# Created by venv
 *
