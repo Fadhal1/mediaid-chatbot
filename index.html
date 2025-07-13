@@ -20,13 +20,53 @@
       border: 2px solid #c1e0a8; /* light green border */
       background-color: #f7faf8;
     }
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      padding: 10px;
+      background-color: #e8f5e8;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+    .typing-indicator .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #228B22;
+      margin: 0 2px;
+      animation: typing 1.4s infinite;
+    }
+    .typing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-10px); }
+    }
+    .message-user {
+      background-color: #f4faf6;
+      border-radius: 15px 15px 5px 15px;
+      padding: 10px 15px;
+      margin: 5px 0;
+      max-width: 80%;
+      margin-left: auto;
+      text-align: right;
+    }
+    .message-bot {
+      background-color: #f3f8f4;
+      border-radius: 15px 15px 15px 5px;
+      padding: 10px 15px;
+      margin: 5px 0;
+      max-width: 80%;
+      border-left: 4px s
+
   </style>
 </head>
 <body class="text-gray-800">
   <header class="bg-white shadow">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center space-x-4">
-        <img src="mediaid-logo.png" alt="MediAid Logo" class="w-10 h-10"> <h1 class="text-2xl font-bold text-green-800">MediAid</h1>
+        <img src="mediaid-logo.png" alt="MediAid Logo" class="w-10 h-10">
+        <h1 class="text-2xl font-bold text-green-800">MediAid</h1>
       </div>
       <nav class="space-x-4">
         <a href="#" class="text-green-700 font-medium hover:underline">Home</a>
@@ -45,10 +85,21 @@
     <section id="chat" class="bg-white py-10 px-4 sm:px-6 lg:px-8">
       <div class="max-w-3xl mx-auto">
         <h2 class="text-2xl font-bold mb-4 text-center text-green-800">MediAid Chatbot</h2>
-        <div class="chat-box rounded-md p-4 mb-4 h-96 overflow-y-auto" id="messages"></div>
+        <div class="chat-box rounded-md p-4 mb-4 h-96 overflow-y-auto" id="messages">
+          <!-- Messages will be added here -->
+        </div>
+        <div class="typing-indicator" id="typingIndicator">
+          <span class="text-green-600 text-sm mr-2">MediAid is thinking...</span>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
         <div class="flex items-center space-x-2">
-          <input type="text" id="userInput" placeholder="Enter a condition (e.g. malaria)..." class="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-600 focus:border-green-600">
-          <button onclick="getResponse()" class="px-4 py-2 text-white rounded-md brand-green">Ask</button>
+          <input type="text" id="userInput" placeholder="Ask about symptoms, drugs, or health conditions..." class="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-600 focus:border-green-600" onkeypress="handleKeyPress(event)">
+          <button onclick="getResponse()" id="askButton" class="px-4 py-2 text-white rounded-md brand-green">Ask</button>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">
+          <span id="dataStatus">Loading dataset...</span>
         </div>
       </div>
     </section>
@@ -56,7 +107,7 @@
     <section id="about" class="bg-green-50 py-12 px-4">
       <div class="max-w-4xl mx-auto text-center">
         <h3 class="text-xl font-bold text-green-900 mb-2">About MediAid</h3>
-        <p>MediAid is designed to support users in rural and urban communities with essential drug information and preventative healthcare advice, all powered by a locally relevant knowledge base.</p>
+        <p>MediAid is designed to support users in rural and urban communities with essential drug information and preventative healthcare advice, all powered by a locally relevant knowledge base and AI assistance.</p>
       </div>
     </section>
   </main>
@@ -66,71 +117,165 @@
   </footer>
 
   <script>
-
     const datasetUrl = './mediaid_full_dataset.json';
     let data = {};
+    let isProcessing = false;
 
+    // Load dataset
     fetch(datasetUrl)
       .then(res => res.json())
       .then(json => {
         data = json;
-        console.log('Loaded dataset:', data); // Log loaded data to console
+        console.log('Loaded dataset:', Object.keys(data).length, 'conditions');
+        document.getElementById('dataStatus').textContent = `Dataset loaded: ${Object.keys(data).length} conditions available`;
       })
-      .catch(error => console.error('Error fetching the dataset:', error)); // Added error handling for fetch
+      .catch(error => {
+        console.error('Error fetching the dataset:', error);
+        document.getElementById('dataStatus').textContent = 'Dataset loading failed - AI mode only';
+      });
 
     // Greet user on page load
     window.onload = function() {
-      const messagesDiv = document.getElementById('messages');
-      messagesDiv.innerHTML += `<div class='text-left text-green-700 my-2'>
-        👋 Hello! I'm MediAid, your local health companion.<br>
-        How can I assist you today? Do you need information about a drug, a disease, or symptoms?
-      </div>`;
+      addMessage('bot', `
+        👋 <strong>Hello! I'm MediAid, your local health companion.</strong><br><br>
+        <em>How can I assist you today?</em>
+        <em>do you need information about a drug, a disease or symptoms?</em>
+      `);
     };
+
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        getResponse();
+      }
+    }
+
+    function addMessage(type, content) {
+      const messagesDiv = document.getElementById('messages');
+      const messageClass = type === 'user' ? 'message-user' : 'message-bot';
+      const extraClass = type === 'error' ? 'error-message' : '';
+      
+      messagesDiv.innerHTML += `<div class='${messageClass} ${extraClass}'>${content}</div>`;
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function showTyping() {
+      document.getElementById('typingIndicator').style.display = 'flex';
+    }
+
+    function hideTyping() {
+      document.getElementById('typingIndicator').style.display = 'none';
+    }
+
+    function setProcessing(processing) {
+      isProcessing = processing;
+      const button = document.getElementById('askButton');
+      const input = document.getElementById('userInput');
+      
+      button.disabled = processing;
+      input.disabled = processing;
+      button.textContent = processing ? 'Processing...' : 'Ask';
+    }
 
     async function getResponse() {
       const inputElem = document.getElementById('userInput');
       const input = inputElem.value.trim();
-      if (!input) return;
-      const messagesDiv = document.getElementById('messages');
-      messagesDiv.innerHTML += `<div class='text-right text-blue-600 my-2'>${input}</div>`;
+      
+      if (!input || isProcessing) return;
+      
+      // Add user message
+      addMessage('user', input);
+      inputElem.value = '';
+      
+      setProcessing(true);
+      showTyping();
 
-      // Check if data is loaded before trying to access it
-      if (Object.keys(data).length === 0) {
-        messagesDiv.innerHTML += `<div class='text-left text-red-500 my-2'>Error: Dataset not loaded. Please try again later or check console for errors.</div>`;
-        return;
-      }
-
-      const key = input.toLowerCase();
-      if (data[key]) {
-        const item = data[key];
-        const reply = `
-          <b>Cause:</b> ${item.cause}<br>
-          <b>Signs & Symptoms:</b> ${item.signs_and_symptoms.join(', ')}<br>
-          <b>Drugs:</b> ${item.drugs.join(', ')}<br>
-          <b>Prevention:</b> ${item.prevention}<br>
-          <b>Advice:</b> ${item.advice}`;
-        messagesDiv.innerHTML += `<div class='text-left text-green-700 my-2'>${reply}</div>`;
-      } else {
-        // Fallback to Gemini API
-        messagesDiv.innerHTML += `<div class='text-left text-gray-500 my-2'>Let me check with my professional resources...</div>`;
-        try {
-          const res = await fetch('http://localhost:8000/api/ai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: input })
-          });
-          const result = await res.json();
-          if (result.text) {
-            messagesDiv.innerHTML += `<div class='text-left text-green-700 my-2'>${result.text}</div>`;
-          } else {
-            messagesDiv.innerHTML += `<div class='text-left text-red-500 my-2'>Sorry, I couldn't find an answer to your question.</div>`;
+      try {
+        // First, check local dataset
+        const localResult = searchLocalData(input);
+        
+        if (localResult) {
+          hideTyping();
+          const reply = `
+            <div class="source-badge">LOCAL DATABASE</div>
+            <strong>Condition:</strong> ${localResult.condition}<br>
+            <strong>Cause:</strong> ${localResult.data.cause}<br>
+            <strong>Signs & Symptoms:</strong> ${localResult.data.signs_and_symptoms.join(', ')}<br>
+            <strong>Recommended Drugs:</strong> ${localResult.data.drugs.join(', ')}<br>
+            <strong>Prevention:</strong> ${localResult.data.prevention}<br>
+            <strong>Advice:</strong> ${localResult.data.advice}
+          `;
+          addMessage('bot', reply);
+        } else {
+          // Fallback to Gemini API
+          try {
+            const response = await fetch('http://localhost:8000/api/ai', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prompt: input })
+            });
+            
+            const result = await response.json();
+            hideTyping();
+            
+            if (result.text) {
+              addMessage('bot', `
+                <div class="source-badge">AI ASSISTANT</div>
+                ${result.text.replace(/\n/g, '<br>')}
+              `);
+            } else if (result.error) {
+              addMessage('error', `
+                <div class="source-badge">ERROR</div>
+                ${result.error}
+              `);
+            } else {
+              addMessage('error', `
+                <div class="source-badge">ERROR</div>
+                Sorry, I couldn't process your request. Please try again.
+              `);
+            }
+          } catch (apiError) {
+            hideTyping();
+            console.error('API Error:', apiError);
+            addMessage('error', `
+              I'm having trouble connecting to my AI service.
+            `);
           }
-        } catch (e) {
-          messagesDiv.innerHTML += `<div class='text-left text-red-500 my-2'>Sorry, there was an error contacting the AI service.</div>`;
+        }
+      } catch (error) {
+        hideTyping();
+        console.error('General Error:', error);
+        addMessage('error', `
+          <div class="source-badge">ERROR</div>
+          Something went wrong. Please try again.
+        `);
+      }
+      
+      setProcessing(false);
+    }
+
+    function searchLocalData(query) {
+      if (Object.keys(data).length === 0) return null;
+      
+      const queryLower = query.toLowerCase();
+      
+      // Direct match
+      if (data[queryLower]) {
+        return { condition: queryLower, data: data[queryLower] };
+      }
+      
+      // Search in condition names and symptoms
+      for (const [condition, info] of Object.entries(data)) {
+        if (condition.includes(queryLower) || 
+            queryLower.includes(condition) ||
+            info.signs_and_symptoms.some(symptom => 
+              symptom.toLowerCase().includes(queryLower) || 
+              queryLower.includes(symptom.toLowerCase())
+            )) {
+          return { condition, data: info };
         }
       }
-      inputElem.value = '';
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      
+      return null;
     }
   </script>
 </body>
