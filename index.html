@@ -88,50 +88,64 @@
       </div>`;
     };
 
-    async function getResponse() {
-      const inputElem = document.getElementById('userInput');
-      const input = inputElem.value.trim();
-      if (!input) return;
-      const messagesDiv = document.getElementById('messages');
-      messagesDiv.innerHTML += `<div class='text-right text-blue-600 my-2'>${input}</div>`;
+async function getResponse() {
+  const inputElem = document.getElementById('userInput');
+  const input = inputElem.value.trim();
+  if (!input) return;
 
-      // Check if data is loaded before trying to access it
-      if (Object.keys(data).length === 0) {
-        messagesDiv.innerHTML += `<div class='text-left text-red-500 my-2'>Error: Dataset not loaded. Please try again later or check console for errors.</div>`;
-        return;
-      }
+  const messagesDiv = document.getElementById('messages');
+  // Display user's message immediately
+  messagesDiv.innerHTML += `<div class="text-right text-blue-600 my-2">${input}</div>`;
 
-      const key = input.toLowerCase();
-      if (data[key]) {
-        const item = data[key];
-        const reply = `
-          <b>Cause:</b> ${item.cause}<br>
-          <b>Signs & Symptoms:</b> ${item.signs_and_symptoms.join(', ')}<br>
-          <b>Drugs:</b> ${item.drugs.join(', ')}<br>
-          <b>Prevention:</b> ${item.prevention}<br>
-          <b>Advice:</b> ${item.advice}`;
-        messagesDiv.innerHTML += `<div class='text-left text-green-700 my-2'>${reply}</div>`;
-      } else {
-        // Fallback to Gemini API
-        messagesDiv.innerHTML += `<div class='text-left text-gray-500 my-2'>Let me check with my professional resources...</div>`;
-        try {
-          const res = await fetch('http://localhost:8000/api/ai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: input })
-          });
-          const result = await res.json();
-          if (result.text) {
-            messagesDiv.innerHTML += `<div class='text-left text-green-700 my-2'>${result.text}</div>`;
-          } else {
-            messagesDiv.innerHTML += `<div class='text-left text-red-500 my-2'>Sorry, I couldn't find an answer to your question.</div>`;
-          }
-        } catch (e) {
-          messagesDiv.innerHTML += `<div class='text-left text-red-500 my-2'>Sorry, there was an error contacting the AI service.</div>`;
-        }
+  // Check if the local dataset is loaded
+  if (Object.keys(data).length === 0) {
+    messagesDiv.innerHTML += `<div class="text-left text-red-500 my-2">Error: Dataset not loaded. Please try again later.</div>`;
+    return;
+  }
+
+  const key = input.toLowerCase();
+  
+  // First, try to find an answer in the local dataset
+  if (data[key]) {
+    const item = data[key];
+    const reply = `<b>Cause:</b> ${item.cause}<br>
+                   <b>Signs & Symptoms:</b> ${item.signs_and_symptoms.join(', ')}<br>
+                   <b>Drugs:</b> ${item.drugs.join(', ')}<br>
+                   <b>Prevention:</b> ${item.prevention}<br>
+                   <b>Advice:</b> ${item.advice}`;
+    messagesDiv.innerHTML += `<div class="text-left text-green-700 my-2">${reply}</div>`;
+  } else {
+    // If not found locally, show a "checking" message and then call the Gemini API
+    messagesDiv.innerHTML += `<div class="text-left text-gray-500 my-2">I don't have that in my local data. Let me check with my professional resources...</div>`;
+
+    try {
+      // This calls the Python API route you created at /api/chat
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: input })
+      });
+
+      const result = await response.json(); // Get the JSON response from your Python code
+
+      // If the API returned an error (like a 500 status), throw an error to be caught below
+      if (!response.ok) {
+        throw new Error(result.error || 'An API error occurred.');
       }
-      inputElem.value = '';
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      
+      // Display the successful reply from Gemini
+      messagesDiv.innerHTML += `<div class="text-left text-green-700 my-2">${result.reply}</div>`;
+
+    } catch (e) {
+      // This will catch any network errors or errors thrown from the API
+      console.error('Error fetching from Gemini API:', e);
+      messagesDiv.innerHTML += `<div class="text-left text-red-500 my-2">Sorry, there was an error contacting the AI service.</div>`;
+    }
+  }
+
+  // Clear the input field and scroll to the bottom of the chat
+  inputElem.value = '';
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
   </script>
 </body>
