@@ -1,53 +1,44 @@
 # File: /api/chat.py
+# File: /api/chat.py
 import os
 import google.generativeai as genai
-from http.server import BaseHTTPRequestHandler
-import json
+from flask import Flask, request, jsonify
 
-# This is a simple HTTP request handler that Vercel can run as a serverless function.
-class handler(BaseHTTPRequestHandler):
+# Vercel will automatically discover this 'app' object.
+app = Flask(__name__)
 
-    def do_POST(self):
-        try:
-            # Get the API key from the Vercel environment variables
-            api_key = os.environ.get("GEMINI_API_KEY")
-            if not api_key:
-                self.send_response(500)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": "GEMINI_API_KEY is not set."}).encode('utf-8'))
-                return
-            
-            genai.configure(api_key=api_key)
-
-            # Get the prompt from the request body
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            request_body = json.loads(post_data)
-            prompt = request_body.get('prompt')
-
-            if not prompt:
-                self.send_response(400)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": "Prompt is required."}).encode('utf-8'))
-                return
-            
-            # Call the Gemini API
-            model = genai.GenerativeModel('gemini-pro') # Using gemini-pro is standard for chat
-            response = model.generate_content(prompt)
-
-            # Send the response back to the frontend
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            response_data = json.dumps({"reply": response.text})
-            self.wfile.write(response_data.encode('utf-8'))
-
-        except Exception as e:
-            self.send_response(500)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
+@app.route('/', defaults={'path': ''}, methods=['POST'])
+@app.route('/<path:path>', methods=['POST'])
+def catch_all(path):
+    try:
+        # --- 1. Configure API Key ---
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            # This error will show up in your Vercel logs
+            print("ERROR: GEMINI_API_KEY environment variable not found.")
+            return jsonify({"error": "AI service is not configured."}), 500
         
-        return
+        genai.configure(api_key=api_key)
+
+        # --- 2. Get Prompt from Frontend ---
+        request_data = request.get_json()
+        if not request_data or 'prompt' not in request_data:
+            return jsonify({"error": "Prompt is required."}), 400
+        
+        prompt = request_data['prompt']
+
+        # --- 3. Call Gemini API ---
+        model = genai.GenerativeModel('gemini-pro')
+        response = model.generate_content(prompt)
+
+        # --- 4. Send Response Back ---
+        return jsonify({"reply": response.text})
+
+    except Exception as e:
+        # This will log the specific error to your Vercel logs for debugging
+        print(f"An unexpected error occurred: {e}")
+        return jsonify({"error": "An internal error occurred."}), 500
+
+# This part is not strictly needed for Vercel but is good practice
+if __name__ == "__main__":
+    app.run(debug=True)
