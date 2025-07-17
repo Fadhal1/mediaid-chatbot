@@ -7,8 +7,12 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "api/chat.py"
+      "src": "/api/chat",
+      "dest": "/api/chat.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
