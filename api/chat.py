@@ -1,5 +1,4 @@
 # File: /api/chat.py
-# File: /api/chat.py
 import os
 import google.generativeai as genai
 from flask import Flask, request, jsonify
