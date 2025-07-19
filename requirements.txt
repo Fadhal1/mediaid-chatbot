@@ -1,3 +1,4 @@
 Flask
 cohere
 python-telegram-bot
+requests
