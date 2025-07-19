@@ -53,11 +53,11 @@ def get_bot_reply(user_prompt):
     if context_data:
         print(f"Found local data for '{user_prompt}'. Replying without AI.")
         reply_text = (
-            f"Cause: {context_data.get('cause', 'N/A')}\n"
-            f"Signs & Symptoms: {', '.join(context_data.get('signs_and_symptoms', []))}\n"
-            f"Drugs: {', '.join(context_data.get('drugs', []))}\n"
-            f"Prevention: {context_data.get('prevention', 'N/A')}\n"
-            f"Advice: {context_data.get('advice', 'N/A')}"
+    f"*Cause:* {context_data.get('cause', 'N/A')}\n\n"
+    f"*Signs & Symptoms:* {', '.join(context_data.get('signs_and_symptoms', []))}\n\n"
+    f"*Drugs:* {', '.join(context_data.get('drugs', []))}\n\n"
+    f"*Prevention:* {context_data.get('prevention', 'N/A')}\n\n"
+    f"*Advice:* {context_data.get('advice', 'N/A')}"
         )
         return reply_text
     
@@ -95,7 +95,7 @@ def telegram_webhook(path=""):
             reply = get_bot_reply(user_text)
             
             # Send the reply back to the user on Telegram
-            await bot.send_message(chat_id=chat_id, text=reply)
+            await bot.send_message(chat_id=chat_id, text=reply, parse_mode='Markdown')
 
     # Run the async function from a sync Flask route
     asyncio.run(process_update())
