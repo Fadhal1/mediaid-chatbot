@@ -1,0 +1,40 @@
+{
+  "builds": [
+    {
+      "src": "api/chat.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/telegram.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/chat",
+      "dest": "api/chat.py"
+    },
+    {
+      "src": "/api/telegram",
+      "dest": "api/telegram.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "index.html"
+    }
+  ]
+}
+```---
+5.  **Commit this new file.** Use a commit message like `build: add vercel configuration for all routes`.
+
+### Why This Fix Works
+
+*   The **`"builds"`** section tells Vercel that both `api/chat.py` and `api/telegram.py` are Python serverless functions and need to be prepared.
+*   The **`"routes"`** section is the map:
+    *   It tells Vercel to send requests for `/api/chat` to your `api/chat.py` file.
+    *   It tells Vercel to send requests for `/api/telegram` to your `api/telegram.py` file.
+    *   Crucially, it tells Vercel that for **any other request** (`/(.*)`), it should show your `index.html` file. This ensures your main website still works.
+
+Once you commit this file and Vercel finishes deploying, your Telegram bot should immediately start responding. You do not need to set the webhook again, as the URL is already correct.
+
+I am so sorry for this oversight. This file is the missing piece of the puzzle.
