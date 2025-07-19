@@ -12,15 +12,15 @@
   "routes": [
     {
       "src": "/api/chat",
-      "dest": "api/chat.py"
+      "dest": "/api/chat.py"
     },
     {
       "src": "/api/telegram",
-      "dest": "api/telegram.py"
+      "dest": "/api/telegram.py"
     },
     {
       "src": "/(.*)",
-      "dest": "index.html"
+      "dest": "/index.html"
     }
   ]
 }
