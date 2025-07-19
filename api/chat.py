@@ -38,32 +38,43 @@ def catch_all(path):
                 found_key = key
                 break
         
-        # --- 3. Define the AI's personality and the message it will receive ---
-        preamble = "You are MediAid, a friendly health companion. You provide clear, structured health information. Always conclude your response by strongly recommending that the user consult a healthcare professional for personal medical advice."
-        message_for_ai = user_prompt # By default, use the user's original message
+        # --- 3. Define the AI's instructions and message ---
+        preamble = (
+            "You are MediAid, a helpful health assistant. You will be given a user's question and some context. "
+            "Your task is to answer the user's question conversationally while structuring the key information in HTML. "
+            "You MUST format the structured part of your response using the exact HTML template provided. "
+            "Conclude by advising the user to consult a healthcare professional."
+        )
+        message_for_ai = user_prompt
 
-        # --- 4. THE SMART PART: If we found a match, transform the prompt ---
+        # --- 4. THE KEY CHANGE: If we find a match, create an example for the AI ---
         if context_data:
-            # Rephrase the user's message into a command for information
-            message_for_ai = f"Give me a detailed and structured overview of {found_key}. Include what it is, common treatments, and prevention advice."
-            
-            # We can even add the context to the preamble for this specific call
-            context_str = (
-                f"Use the following information to inform your answer about '{found_key}':\n"
-                f"- Signs and Symptoms: {', '.join(context_data.get('signs_and_symptoms', []))}\n"
-                f"- Recommended Drugs: {', '.join(context_data.get('drugs', []))}"
+            # This is the exact HTML template we want the AI to follow.
+            example_format = (
+                "<b>Cause:</b> [AI-generated summary of the cause here]<br>"
+                "<b>Signs & Symptoms:</b> [AI-generated list of symptoms here]<br>"
+                "<b>Drugs:</b> [AI-generated list of drugs here]<br>"
+                "<b>Prevention:</b> [AI-generated summary of prevention here]<br>"
+                "<b>Advice:</b> [AI-generated summary of advice here]"
             )
-            preamble = f"{preamble}\n\nHere is some context to help you:\n{context_str}"
+            
+            # Combine the context and the example format into a single, powerful prompt for the AI.
+            message_for_ai = (
+                f"The user is asking about '{found_key}'. Here is the information I have:\n"
+                f"CONTEXT: {json.dumps(context_data)}\n\n"
+                f"Based on the context, please answer the user's question. Start with a brief, friendly introductory sentence. "
+                f"Then, you MUST present the detailed information using this exact HTML format:\n"
+                f"EXAMPLE FORMAT:\n{example_format}"
+            )
 
-
-        # --- 5. Call Cohere with the (potentially new) message and preamble ---
+        # --- 5. Call Cohere with our highly specific instructions ---
         response = co.chat(
             message=message_for_ai,
-            model="command-r",  # Let's upgrade to a more powerful model for better results
+            model="command-r",  # A powerful model that can follow complex instructions
             preamble=preamble
         )
 
-        # --- 6. Send the detailed response back ---
+        # --- 6. Send the AI's structured response back ---
         return jsonify({"reply": response.text})
 
     except Exception as e:
