@@ -7,7 +7,7 @@
   <title>MediAid - Health Companion</title>
   <link rel="icon" href="mediaid-logo.png" type="image/png" />
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <style>
+    <style>
     body {
       background-color: #a7f73f; /* light chartreuse */
     }
@@ -21,18 +21,21 @@
       border: 2px solid #c1e0a8; /* light green border */
       background-color: #f7faf8;
     }
-/* New, improved style for two-tone green text */
-.ai-response {
-  color: #008060; /* Consistent green for ALL AI response text */
-}
 
-.ai-response b,
-.ai-response strong,
-.ai-response i,
-.ai-response em {
-  color: inherit; /* Inherit color from .ai-response for all formatting tags */
-}
-  </style>
+    /* --- THIS IS THE CORRECTED CODE --- */
+    .ai-response {
+      /* This sets the lighter green for the description text. */
+      /* It matches the color of your welcome message. */
+      color: #047857; /* Tailwind's green-700 */
+    }
+
+    .ai-response b {
+      /* This sets a different, DARKER green ONLY for the bolded headings. */
+      color: #064e3b; /* Tailwind's green-900 for strong contrast */
+    }
+    /* --- END OF CORRECTED CODE --- */
+
+    </style>
 </head>
 <body class="text-gray-800">
   <header class="bg-white shadow">
