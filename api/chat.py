@@ -31,51 +31,58 @@ def catch_all(path):
 
         # --- 2. Search local data for keywords ---
         context_data = None
-        found_key = ""
         for key in local_data:
             if key in user_prompt:
                 context_data = local_data[key]
-                found_key = key
                 break
         
-        # --- 3. Define the AI's instructions and message ---
-        preamble = (
-            "You are MediAid, a helpful health assistant. You will be given a user's question and some context. "
-            "Your task is to answer the user's question conversationally while structuring the key information in HTML. "
-            "You MUST format the structured part of your response using the exact HTML template provided. "
-            "Conclude by advising the user to consult a healthcare professional."
-        )
-        message_for_ai = user_prompt
-
-        # --- 4. THE KEY CHANGE: If we find a match, create an example for the AI ---
+        # --- 3. If a local match is found, force the AI into the template ---
         if context_data:
-            # This is the exact HTML template we want the AI to follow.
-            example_format = (
-                "<b>Cause:</b> [AI-generated summary of the cause here]<br>"
-                "<b>Signs & Symptoms:</b> [AI-generated list of symptoms here]<br>"
-                "<b>Drugs:</b> [AI-generated list of drugs here]<br>"
-                "<b>Prevention:</b> [AI-generated summary of prevention here]<br>"
-                "<b>Advice:</b> [AI-generated summary of advice here]"
+            # The AI's unbreakable persona and rules for this specific task
+            preamble = (
+                "You are an information-structuring AI. You will receive context about a medical condition. "
+                "Your task is to populate a predefined HTML template with this information. "
+                "Your tone must be clinical and direct. "
+                "You MUST NOT add any extra text, introductions, or conclusions. "
+                "Your entire response MUST start with '<b>Cause:' and end with the final piece of advice."
+            )
+
+            # The direct command given to the AI
+            message_for_ai = (
+                f"Use the following context to populate the template:\n"
+                f"CONTEXT: {json.dumps(context_data)}\n\n"
+                f"TEMPLATE:\n"
+                "<b>Cause:</b> [Insert a clinical summary of the cause here]\n"
+                "<b>Signs & Symptoms:</b> [Insert a clinical list of symptoms here]\n"
+                "<b>Drugs:</b> [Insert a clinical list of drugs here]\n"
+                "<b>Prevention:</b> [Insert a clinical summary of prevention methods here]\n"
+                "<b>Advice:</b> [Insert a clinical summary of the advice here]"
+            )
+
+            response = co.chat(
+                message=message_for_ai,
+                model="command-r",
+                preamble=preamble
             )
             
-            # Combine the context and the example format into a single, powerful prompt for the AI.
-            message_for_ai = (
-                f"The user is asking about '{found_key}'. Here is the information I have:\n"
-                f"CONTEXT: {json.dumps(context_data)}\n\n"
-                f"Based on the context, please answer the user's question. Start with a brief, friendly introductory sentence. "
-                f"Then, you MUST present the detailed information using this exact HTML format:\n"
-                f"EXAMPLE FORMAT:\n{example_format}"
+            # We now return the AI's response, which should be perfectly formatted.
+            return jsonify({"reply": response.text})
+
+        # --- 4. If NO local match, handle as a general query ---
+        else:
+            fallback_preamble = (
+                "You are MediAid, a professional pharmacist AI. Your primary role is to provide information on specific medical conditions based on your internal data. "
+                "If a user asks a question you cannot answer with specific data, you must state that you can only provide information on specific conditions and that for personal medical advice, they must consult a healthcare professional. "
+                "Do not attempt to answer questions outside of your scope."
             )
-
-        # --- 5. Call Cohere with our highly specific instructions ---
-        response = co.chat(
-            message=message_for_ai,
-            model="command-r",  # A powerful model that can follow complex instructions
-            preamble=preamble
-        )
-
-        # --- 6. Send the AI's structured response back ---
-        return jsonify({"reply": response.text})
+            
+            response = co.chat(
+                message=user_prompt,
+                model="command-r",
+                preamble=fallback_preamble
+            )
+            
+            return jsonify({"reply": response.text})
 
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
