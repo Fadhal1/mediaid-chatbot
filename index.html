@@ -21,6 +21,15 @@
       border: 2px solid #c1e0a8; /* light green border */
       background-color: #f7faf8;
     }
+    /* Add these new styles inside the <style> tag */
+
+.ai-response {
+  color: #4B5563; /* This is a medium-dark gray (like Tailwind's gray-600) */
+}
+
+.ai-response b {
+  color: #1F2937; /* This is a very dark gray (like Tailwind's gray-800) */
+}
   </style>
 </head>
 <body class="text-gray-800">
@@ -118,7 +127,7 @@
     }
     
     // 3. Display the reply directly from the backend.
-    messagesDiv.innerHTML += `<div class="text-left text-green-700 my-2">${result.reply}</div>`;
+    messagesDiv.innerHTML += `<div class="text-left ai-response my-2">${result.reply}</div>`;
 
   } catch (e) {
     // This will catch any network errors or other problems.
