@@ -90,7 +90,9 @@
     
     async function getResponse() {
   const inputElem = document.getElementById('userInput');
-  const input = input.value.trim();
+  // THIS IS THE CORRECTED LINE:
+  const input = inputElem.value.trim();
+  
   if (!input) return;
 
   const messagesDiv = document.getElementById('messages');
@@ -115,8 +117,7 @@
       throw new Error(result.error || 'An API error occurred.');
     }
     
-    // 3. Display the reply directly from the backend. 
-    // We removed the hardcoded "I don't have that..." message.
+    // 3. Display the reply directly from the backend.
     messagesDiv.innerHTML += `<div class="text-left text-green-700 my-2">${result.reply}</div>`;
 
   } catch (e) {
@@ -127,7 +128,7 @@
 
   // 4. Scroll to the new message
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
+      }
   </script>
 </body>
 </html>
