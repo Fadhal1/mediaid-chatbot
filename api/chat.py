@@ -6,7 +6,8 @@ from flask import Flask, request, jsonify
 # Vercel will automatically discover this 'app' object.
 app = Flask(__name__)
 
-MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.2"
+# THIS IS THE ONLY CHANGE: A smaller, more reliable model
+MODEL_NAME = "microsoft/DialoGPT-medium"
 API_URL = f"https://api-inference.huggingface.co/models/{MODEL_NAME}"
 
 @app.route('/', defaults={'path': ''}, methods=['POST'])
@@ -30,7 +31,6 @@ def catch_all(path):
         user_prompt = request_data['prompt']
 
         # --- 4. Construct the payload for a "conversational" task ---
-        # This is the correct format that the server expects.
         payload = {
             "inputs": {
                 "text": user_prompt
@@ -39,24 +39,18 @@ def catch_all(path):
 
         # --- 5. Make the direct API call using 'requests' library ---
         response = requests.post(API_URL, headers=headers, json=payload)
-        
-        # This will raise an error if the request failed (e.g., 4xx or 5xx)
         response.raise_for_status() 
-        
         response_data = response.json()
 
         # --- 6. Send Response Back ---
-        # Extract the reply from the correct field for conversational tasks.
         generated_reply = response_data.get('generated_text', 'Sorry, I received a response but could not process it.')
         return jsonify({"reply": generated_reply})
 
     except requests.exceptions.HTTPError as http_err:
-        # Log the specific HTTP error from Hugging Face
         print(f"HTTP error occurred: {http_err}")
         print(f"Response content: {http_err.response.content}")
         return jsonify({"error": f"Error from AI service: {http_err.response.status_code}"}), 500
 
     except Exception as e:
-        # This will log any other errors
         print(f"An unexpected error occurred: {e}")
         return jsonify({"error": "An internal error occurred."}), 500
