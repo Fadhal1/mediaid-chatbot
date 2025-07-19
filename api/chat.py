@@ -27,17 +27,18 @@ def catch_all(path):
         if not request_data or 'prompt' not in request_data:
             return jsonify({"error": "Prompt is required."}), 400
         
-        prompt = request_data['prompt']
+        user_prompt = request_data['prompt']
 
-        # --- 4. Call Hugging Face API with the CORRECT task ---
-        # We switched from client.text_generation to client.conversational
-        # This matches what the error message told us to do.
-        response_data = client.conversational(prompt) # <-- THIS IS THE MAIN CHANGE
+        # --- 4. Format the prompt for the Mistral model ---
+        # This is the crucial fix. We wrap the prompt in instruction tags.
+        formatted_prompt = f"[INST] {user_prompt} [/INST]"
 
-        # --- 5. Send Response Back ---
-        # The response format is different, so we get the 'generated_text'
-        generated_reply = response_data.get('generated_text', 'Sorry, I could not process that.') # <-- THIS LINE IS ALSO UPDATED
-        return jsonify({"reply": generated_reply})
+        # --- 5. Call Hugging Face API with the correct method ---
+        # We are back to using .text_generation, which exists.
+        response = client.text_generation(formatted_prompt, max_new_tokens=250)
+
+        # --- 6. Send Response Back ---
+        return jsonify({"reply": response})
 
     except Exception as e:
         # This will log the specific error to your Vercel logs
