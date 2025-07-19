@@ -6,7 +6,7 @@ from huggingface_hub import InferenceClient
 # Vercel will automatically discover this 'app' object.
 app = Flask(__name__)
 
-# We will use a powerful open-source chat model from Mistral AI
+# We will use the same powerful open-source chat model
 MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.2"
 
 @app.route('/', defaults={'path': ''}, methods=['POST'])
@@ -14,10 +14,9 @@ MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.2"
 def catch_all(path):
     try:
         # --- 1. Get API Key (your Hugging Face Token) ---
-        # We are still using the same environment variable name for simplicity
         api_key = os.environ.get("GEMINI_API_KEY") 
         if not api_key:
-            print("ERROR: Hugging Face Token (HF_TOKEN/GEMINI_API_KEY) not found.")
+            print("ERROR: Hugging Face Token not found.")
             return jsonify({"error": "AI service is not configured."}), 500
 
         # --- 2. Initialize the client ---
@@ -30,13 +29,15 @@ def catch_all(path):
         
         prompt = request_data['prompt']
 
-        # --- 4. Call Hugging Face API ---
-        # The 'text_generation' endpoint is used for this kind of model
-        response = client.text_generation(prompt, max_new_tokens=250)
+        # --- 4. Call Hugging Face API with the CORRECT task ---
+        # We switched from client.text_generation to client.conversational
+        # This matches what the error message told us to do.
+        response_data = client.conversational(prompt) # <-- THIS IS THE MAIN CHANGE
 
         # --- 5. Send Response Back ---
-        # The response format is different from Gemini's
-        return jsonify({"reply": response})
+        # The response format is different, so we get the 'generated_text'
+        generated_reply = response_data.get('generated_text', 'Sorry, I could not process that.') # <-- THIS LINE IS ALSO UPDATED
+        return jsonify({"reply": generated_reply})
 
     except Exception as e:
         # This will log the specific error to your Vercel logs
