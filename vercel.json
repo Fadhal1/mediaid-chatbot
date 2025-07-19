@@ -1,22 +1,12 @@
 {
-  "builds": [
-    {
-      "src": "api/chat.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "api/telegram.py",
-      "use": "@vercel/python"
-    }
-  ],
   "routes": [
     {
       "src": "/api/chat",
-      "dest": "/api/chat.py"
+      "dest": "api/chat.py"
     },
     {
       "src": "/api/telegram",
-      "dest": "/api/telegram.py"
+      "dest": "api/telegram.py"
     },
     {
       "src": "/(.*)",
