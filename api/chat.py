@@ -1,26 +1,26 @@
 # File: /api/chat.py
 import os
+import requests
 from flask import Flask, request, jsonify
-from huggingface_hub import InferenceClient
 
 # Vercel will automatically discover this 'app' object.
 app = Flask(__name__)
 
-# We will use the same powerful open-source chat model
 MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.2"
+API_URL = f"https://api-inference.huggingface.co/models/{MODEL_NAME}"
 
 @app.route('/', defaults={'path': ''}, methods=['POST'])
 @app.route('/<path:path>', methods=['POST'])
 def catch_all(path):
     try:
         # --- 1. Get API Key (your Hugging Face Token) ---
-        api_key = os.environ.get("GEMINI_API_KEY") 
-        if not api_key:
+        hf_token = os.environ.get("GEMINI_API_KEY") 
+        if not hf_token:
             print("ERROR: Hugging Face Token not found.")
             return jsonify({"error": "AI service is not configured."}), 500
 
-        # --- 2. Initialize the client ---
-        client = InferenceClient(model=MODEL_NAME, token=api_key)
+        # --- 2. Prepare the manual API request ---
+        headers = {"Authorization": f"Bearer {hf_token}"}
 
         # --- 3. Get Prompt from Frontend ---
         request_data = request.get_json()
@@ -29,18 +29,34 @@ def catch_all(path):
         
         user_prompt = request_data['prompt']
 
-        # --- 4. Format the prompt for the Mistral model ---
-        # This is the crucial fix. We wrap the prompt in instruction tags.
-        formatted_prompt = f"[INST] {user_prompt} [/INST]"
+        # --- 4. Construct the payload for a "conversational" task ---
+        # This is the correct format that the server expects.
+        payload = {
+            "inputs": {
+                "text": user_prompt
+            }
+        }
 
-        # --- 5. Call Hugging Face API with the correct method ---
-        # We are back to using .text_generation, which exists.
-        response = client.text_generation(formatted_prompt, max_new_tokens=250)
+        # --- 5. Make the direct API call using 'requests' library ---
+        response = requests.post(API_URL, headers=headers, json=payload)
+        
+        # This will raise an error if the request failed (e.g., 4xx or 5xx)
+        response.raise_for_status() 
+        
+        response_data = response.json()
 
         # --- 6. Send Response Back ---
-        return jsonify({"reply": response})
+        # Extract the reply from the correct field for conversational tasks.
+        generated_reply = response_data.get('generated_text', 'Sorry, I received a response but could not process it.')
+        return jsonify({"reply": generated_reply})
+
+    except requests.exceptions.HTTPError as http_err:
+        # Log the specific HTTP error from Hugging Face
+        print(f"HTTP error occurred: {http_err}")
+        print(f"Response content: {http_err.response.content}")
+        return jsonify({"error": f"Error from AI service: {http_err.response.status_code}"}), 500
 
     except Exception as e:
-        # This will log the specific error to your Vercel logs
+        # This will log any other errors
         print(f"An unexpected error occurred: {e}")
         return jsonify({"error": "An internal error occurred."}), 500
