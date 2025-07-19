@@ -40,23 +40,23 @@ def catch_all(path):
         if context_data:
             # The AI's unbreakable persona and rules for this specific task
             preamble = (
-                "You are an information-structuring AI. You will receive context about a medical condition. "
-                "Your task is to populate a predefined HTML template with this information. "
-                "Your tone must be clinical and direct. "
-                "You MUST NOT add any extra text, introductions, or conclusions. "
-                "Your entire response MUST start with '<b>Cause:' and end with the final piece of advice."
+                "You are a data formatting AI. Your only function is to populate an HTML template with provided medical context. "
+                "Your tone must be clinical and direct, using only the provided data. "
+                "You MUST NOT use newline characters (`\n`). You MUST use `<br>` for line breaks. "
+                "Your entire response MUST be a single block of HTML starting with '<b>Cause:'."
             )
 
-            # The direct command given to the AI
+            # The direct command given to the AI, with the template repeated for emphasis
             message_for_ai = (
-                f"Use the following context to populate the template:\n"
+                f"Using the provided context, populate the following HTML template. "
+                f"Do not add any text before or after the template. "
                 f"CONTEXT: {json.dumps(context_data)}\n\n"
-                f"TEMPLATE:\n"
-                "<b>Cause:</b> [Insert a clinical summary of the cause here]\n"
-                "<b>Signs & Symptoms:</b> [Insert a clinical list of symptoms here]\n"
-                "<b>Drugs:</b> [Insert a clinical list of drugs here]\n"
-                "<b>Prevention:</b> [Insert a clinical summary of prevention methods here]\n"
-                "<b>Advice:</b> [Insert a clinical summary of the advice here]"
+                f"TEMPLATE TO POPULATE:\n"
+                "<b>Cause:</b> [Insert clinical summary of cause]\n"
+                "<b>Signs & Symptoms:</b> [Insert clinical list of symptoms]\n"
+                "<b>Drugs:</b> [Insert clinical list of drugs]\n"
+                "<b>Prevention:</b> [Insert clinical summary of prevention]\n"
+                "<b>Advice:</b> [Insert clinical summary of advice]"
             )
 
             response = co.chat(
@@ -65,15 +65,16 @@ def catch_all(path):
                 preamble=preamble
             )
             
-            # We now return the AI's response, which should be perfectly formatted.
-            return jsonify({"reply": response.text})
+            # Final check: sometimes the AI still adds extra newlines. We remove them.
+            clean_reply = response.text.replace('\n', ' ')
+            return jsonify({"reply": clean_reply})
 
         # --- 4. If NO local match, handle as a general query ---
         else:
             fallback_preamble = (
-                "You are MediAid, a local health companion. Your primary role is to provide information on specific medical conditions based on your internal data. "
-                "If a user asks a question you cannot answer with specific data, you must state that you can only provide information on specific conditions and that for personal medical advice, they must consult a healthcare professional. "
-                "Do not attempt to answer questions outside of your scope."
+                "You are MediAid, a professional medical aid. If a user asks a question you cannot answer with specific data, "
+                "you must state that you can only provide information on specific conditions and that for personal medical advice, "
+                "they must consult a healthcare professional. Do not attempt to answer questions outside of your scope."
             )
             
             response = co.chat(
