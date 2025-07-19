@@ -1,2 +1,2 @@
-google-generativeai
 Flask
+huggingface_hub
