@@ -1,2 +1,3 @@
 Flask
 cohere
+python-telegram-bot
